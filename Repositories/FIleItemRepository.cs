@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using FileSharing.Models;
 
-public class FileItemService : RepositoryBase<FileItem>,IFileItemService
+public class FileItemRepository : RepositoryBase<FileItem>,IFileItemService
 {
     public FileItemService(FileSharingDbContext dbContext) : base(dbContext)
     {
