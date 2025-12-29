@@ -6,7 +6,7 @@ public class FileSharingDbContext : DbContext
 {
     public FileSharingDbContext(DbContextOptions options) : base(options)
     {}
-    public DbSet<FileItem> Files { get; set; }
+    public DbSet<FileItem> FileItems { get; set; }
     public DbSet<FileItemAccess> FilesAccesess { get; set; }
     public DbSet<User> Users { get; set; }
 
@@ -45,7 +45,7 @@ public class FileSharingDbContext : DbContext
 
             e.HasOne(e => e.Owner) // usuwasz to => OnDelete
             .WithMany(e => e.OwnedFiles)
-            .HasForeignKey(e => e.Owner.Id)
+            .HasForeignKey(e => e.OwnerId)
             .OnDelete(DeleteBehavior.Cascade); //bo softDelete
 
             e.HasOne(e => e.Parent) // usuwasz to => OnDelete
