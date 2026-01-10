@@ -11,7 +11,7 @@ public class FileItem {
 
     // FK
     public string OwnerId  { get; set; } = string.Empty;
-    public string ParentId  { get; set; } = string.Empty;
+    public string? ParentId  { get; set; }
 
     // Kategoryzacja
     public bool? Starred { get; set; } 

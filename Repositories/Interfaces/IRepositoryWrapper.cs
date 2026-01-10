@@ -1,4 +1,6 @@
 public interface IRepositoryWrapper
 {
-   IFileItemService fileItemService{ get; }
+   IFileItemRepository fileItemRepo{ get; }
+
+   Task SaveAsync();
 }
