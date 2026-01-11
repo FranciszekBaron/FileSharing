@@ -5,6 +5,10 @@ public class RepositoryWrapper : IRepositoryWrapper
 
     private IFileItemRepository _fileItemRepo;
 
+    private IFileItemAccessRepository _fileItemAccessRepo;
+
+    
+
     public RepositoryWrapper(FileSharingDbContext dbContext)
     {
         _dbContext = dbContext; 
@@ -17,6 +21,18 @@ public class RepositoryWrapper : IRepositoryWrapper
                 _fileItemRepo = new FileItemRepository(_dbContext);
             }
             return _fileItemRepo;
+        }
+    }
+
+    public IFileItemAccessRepository fileItemAccessRepo
+    {
+        get
+        {
+            if( _fileItemAccessRepo == null)
+            {
+                _fileItemAccessRepo = new FileItemAccessRepository( _dbContext);
+            }
+            return _fileItemAccessRepo;
         }
     }
 

@@ -7,8 +7,6 @@ public class FileItemRepository : RepositoryBase<FileItem>, IFileItemRepository
     {
     }
 
-   
-
     public Task<IEnumerable<FileItem>> GetAllItems()
     {
         return GetAllAsync();

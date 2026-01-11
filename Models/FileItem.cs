@@ -31,11 +31,17 @@ public class FileItem {
     public ICollection<FileItemAccess> FileItemAccesses { get; set; } = new List<FileItemAccess>(); // dlatego ze one to Many do File Access
 
 
-
-
-
-
-    
-
-
+    public override string ToString()
+    {
+        return
+            $"Id: {Id}\n" +
+            $"Name: {Name}\n" +
+            $"Type: {Type}\n" +
+            $"Size: {Size}\n" +
+            $"OwnerId: {OwnerId}\n" +
+            $"ParentId: {ParentId}\n" +
+            $"ModifiedDate: {ModifiedDate}\n" +
+            $"Starred: {Starred}\n" +
+            $"Deleted: {Deleted}";
+    }
 }

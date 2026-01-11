@@ -18,4 +18,17 @@ public class FileItemAccess
     public User User { get; set; } = null!;
     public FileItem FileItem { get; set; } = null!;
 
+
+    public override string ToString()
+    {
+        return
+            $"Id: {Id}\n" +
+            $"UserId: {UserId}\n" +
+            $"FileItemId: {FileItemId}\n" +
+            $"PermissionType: {PermissionType}\n" +
+            $"SharedDate: {SharedDate}";
+    }
+
+
+
 }

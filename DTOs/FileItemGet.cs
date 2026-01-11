@@ -10,5 +10,7 @@ public class FileItemGet
     public string? ParentId { get; set; }
     public bool Starred { get; set; }
     public bool Deleted { get; set; }
+
+    public DateTime deletedAt { get; set; }
     public string Permission { get; set; } = string.Empty;
 }
