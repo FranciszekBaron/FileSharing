@@ -9,6 +9,7 @@ public class FileItem {
     public long? Size { get; set; } 
     public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
+
     // FK
     public string OwnerId  { get; set; } = string.Empty;
     public string? ParentId  { get; set; }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FileSharing.Migrations
 {
     [DbContext(typeof(FileSharingDbContext))]
-    partial class FileSharingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260111193809_DeleteStoragePath")]
+    partial class DeleteStoragePath
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,6 +91,10 @@ namespace FileSharing.Migrations
                     b.Property<bool?>("Starred")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("StoragePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -106,35 +113,6 @@ namespace FileSharing.Migrations
                     b.HasIndex("Starred");
 
                     b.ToTable("FileItems");
-                });
-
-            modelBuilder.Entity("RefreshToken", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -204,17 +182,6 @@ namespace FileSharing.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("RefreshToken", b =>
-                {
-                    b.HasOne("User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("FileSharing.Models.FileItem", b =>
                 {
                     b.Navigation("Children");
@@ -227,8 +194,6 @@ namespace FileSharing.Migrations
                     b.Navigation("FileAccesses");
 
                     b.Navigation("OwnedFiles");
-
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

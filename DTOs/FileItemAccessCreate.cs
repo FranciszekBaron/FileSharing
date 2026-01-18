@@ -1,5 +1,5 @@
 public class  FileItemAccessCreate
 {
-    public string UserId { get; set; }
+    public List<string> Emails { get; set; }
     public string Permission { get; set; }
 }

@@ -1,9 +1,39 @@
+using System.Text;
 using FileSharing.Services;
 using FileSharing.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],           // np. "FileSharing"
+        ValidAudience = builder.Configuration["Jwt:Audience"],       // np. "FileSharing.WebApp"
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!) 
+        )
+    };
+});
+
+
+
+
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 
@@ -17,6 +47,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IRepositoryWrapper,RepositoryWrapper>();
 builder.Services.AddScoped<IFileService,FileService>();
+builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddDbContext<FileSharingDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -46,10 +77,36 @@ if (app.Environment.IsDevelopment())
 }
 
 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("=== Request Debug ===");
+    Console.WriteLine($"Path: {context.Request.Path}");
+    Console.WriteLine($"Method: {context.Request.Method}");
+    
+    if (context.Request.Headers.ContainsKey("Authorization"))
+    {
+        Console.WriteLine($"Auth Header: {context.Request.Headers["Authorization"]}");
+    }
+    else
+    {
+        Console.WriteLine("⚠️ NO Authorization header!");
+    }
+    
+    await next();
+    
+    Console.WriteLine($"Response Status: {context.Response.StatusCode}");
+    Console.WriteLine("===================\n");
+});
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+
 
 app.MapControllers();
 

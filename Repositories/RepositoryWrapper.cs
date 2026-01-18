@@ -6,6 +6,10 @@ public class RepositoryWrapper : IRepositoryWrapper
     private IFileItemRepository _fileItemRepo;
 
     private IFileItemAccessRepository _fileItemAccessRepo;
+    
+    private IRefreshTokenRepository _refreshTokenRepo;
+
+    private IUserRepository _userRepo;
 
     
 
@@ -33,6 +37,30 @@ public class RepositoryWrapper : IRepositoryWrapper
                 _fileItemAccessRepo = new FileItemAccessRepository( _dbContext);
             }
             return _fileItemAccessRepo;
+        }
+    }
+
+    public IUserRepository userRepo
+    {
+        get
+        {
+            if(_userRepo == null)
+            {
+                _userRepo = new UserRepository(_dbContext);
+            }
+            return _userRepo;
+        }
+    }
+
+    public IRefreshTokenRepository refreshTokenRepo
+    {
+        get
+        {
+            if(_refreshTokenRepo == null)
+            {
+                _refreshTokenRepo = new RefreshTokenRepository(_dbContext);
+            }
+            return _refreshTokenRepo;
         }
     }
 

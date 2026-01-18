@@ -4,5 +4,9 @@ public interface IRepositoryWrapper
 
    IFileItemAccessRepository fileItemAccessRepo { get; }
 
+   IUserRepository userRepo { get; }
+
+   IRefreshTokenRepository refreshTokenRepo {get;}
+
    Task SaveAsync();
 }

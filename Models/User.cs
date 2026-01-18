@@ -13,5 +13,6 @@ public class User
     //wysylac osobne zapytanie po np Ownera tego File, wtedy 2 queries zamiast jednego, ale przy loopie 100 dodatkowych queries np. N+1 problem
     public ICollection<FileItem> OwnedFiles { get; set; } = new List<FileItem>();
     public ICollection<FileItemAccess> FileAccesses { get; set; } = new List<FileItemAccess>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
 }

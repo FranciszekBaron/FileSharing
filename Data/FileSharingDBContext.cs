@@ -10,6 +10,8 @@ public class FileSharingDbContext : DbContext
     public DbSet<FileItemAccess> FilesAccesess { get; set; }
     public DbSet<User> Users { get; set; }
 
+    public DbSet<RefreshToken> RefreshToken { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +32,7 @@ public class FileSharingDbContext : DbContext
             e.Property(e=>e.Size);
             e.Property(e=>e.ModifiedDate)
                 .IsRequired();
+
 
 
             //FK
@@ -118,6 +121,33 @@ public class FileSharingDbContext : DbContext
             // Email unikalny
             e.HasIndex(u => u.Email)
                 .IsUnique();
+        });
+
+
+        modelBuilder.Entity<RefreshToken>(e =>
+        {
+            //PK
+            e.HasKey(t => t.Id);
+
+            //FK
+            e.Property(t=>t.UserId)
+                .IsRequired();
+
+            e.Property(t=>t.Token)
+                .IsRequired();
+            e.Property(t=>t.ExpiresAt)
+                .IsRequired();
+            e.Property(t=>t.CreatedAt)
+                .IsRequired();
+            e.Property(t=>t.IsRevoked)
+                .IsRequired();
+            
+            e.HasOne(t=>t.User) 
+            .WithMany(u=>u.RefreshTokens)
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
         });
     }
 }
