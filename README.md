@@ -71,6 +71,22 @@ I gained deeper insight into ASP.NET Core application startup:
 - Best practices for registering services (singleton, scoped, transient) depending on their lifetime and usage.
 - Understanding the flow from HTTP request → middleware → controller → service → database, which made the architecture much clearer.
 
+### File Type Validation & Security
+Challenge: Ensuring uploaded files are safe and match their declared type to prevent malicious file uploads.
+What I learned:
+- MIME type validation is not enough - users can spoof Content-Type headers
+- Implemented multi-layer validation:
+  - Check file extension against whitelist
+  - Verify MIME type from HTTP headers
+  - Read magic bytes (file signature) to detect actual file type
+  - Compare declared type vs. actual file content
+  
+- Security considerations:
+  - Store files outside webroot to prevent direct execution
+  - Generate unique filenames (GUID) to prevent path traversal attacks
+  - Limit file size to prevent DoS attacks
+  - Sanitize filenames to prevent directory traversal (../../../etc/passwd)
+
 
 ## Technical Decisions & Challenges
 
@@ -93,6 +109,12 @@ Permanent deletion is implemented in **two separate methods**:
 This separation ensures that:
 - User-initiated deletions are safe, predictable, and fail fast if something is wrong.
 - Automated cleanup can operate efficiently on multiple files and nested folders without breaking the system or leaving orphaned data.
+
+
+## Possible Improvements
+- Add unit and integration tests
+- Implement caching for frequently accessed data
+- CI/CD pipeline
 
 
 
