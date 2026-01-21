@@ -11,13 +11,38 @@ The application uses configuration based on `appsettings.json` and environment v
 - Postgresql Server
 - Docker
 
-## Configuration 
+## Configuration
 The application requires the following configuration values:
-Database connection string
-Application secrets (e.g. JWT secret key)
+- Database connection string
+- Application secrets (e.g., JWT secret key)
 
-Sensitive configuration values are not committed to the repository.
-A sample configuration file is provided:
+**Sensitive configuration values are not committed to the repository.**  
+Example of appsetings congfiguration is below: 
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Database connection string here"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore": "Information"
+    }
+  },
+  "Jwt": {
+    "JwtSecret": "Secret",
+    "Issuer": "YourIssuer",
+    "Audience": "YourAudience",
+    "AccessTokenExpirationMinutes": 60,
+    "RefreshTokenExpirationDays": 7
+  },
+  "AllowedHosts": "*"
+}
+```
+
+
 
 ## File Management API Endpoints
 All endpoints require authentication (JWT Bearer token).
