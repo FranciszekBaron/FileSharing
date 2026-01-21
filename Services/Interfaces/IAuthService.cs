@@ -7,4 +7,6 @@ public interface IAuthService
     Task<bool> LogoutAsync(string refreshToken);
 
     Task<bool> LogoutAllAsync(string userId);
+    
+    Task<User> MeAsync(string userId);
 }   

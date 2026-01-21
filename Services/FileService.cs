@@ -358,6 +358,7 @@ public class FileService : IFileService {
         return true;
     }
 
+    
     public async Task<List<UserGetDto>> GetAllSharedUsers(string userId)
     {
         if(userId == null)
@@ -476,6 +477,11 @@ public class FileService : IFileService {
         if (fileName.Length > 255)
             throw new ArgumentException("Name is too long (max 255 characters)");
 
+        if (fileName.Contains("<") || fileName.Contains(">") || fileName.Contains("script"))
+        {
+            throw new ArgumentException("Invalid file name");
+        }
+
         char[] invalidChars = Path.GetInvalidFileNameChars();
         if (fileName.IndexOfAny(invalidChars) >= 0)
             throw new ArgumentException("Name contains invalid characters");
@@ -518,7 +524,7 @@ public class FileService : IFileService {
     }
 
 
-    public async Task<string> SaveFileToStorageAsync(IFormFile file,string userId)
+    private async Task<string> SaveFileToStorageAsync(IFormFile file,string userId)
     {
 
         //TODO - zmienić na _configuration
@@ -535,6 +541,9 @@ public class FileService : IFileService {
 
         return filePath;
     }
+
+
+   
 
     public async Task<(FileStream fileStream, string fileName, string contentType)> DownloadFileAsync(string fileId, string userId)
     {
@@ -599,6 +608,66 @@ public class FileService : IFileService {
         await _repository.SaveAsync();
 
         return true;
+    }
+
+    private async Task<bool> PermanentFileInternalDeleteAsync(string fileId)
+    {
+        var itemToDelete = await  _repository.fileItemRepo.GetByIdAsync(fileId);  
+        
+        if (itemToDelete == null)
+            throw new KeyNotFoundException("File not found");
+        
+        // 3. Sprawdź czy już usunięty
+        if (itemToDelete.Deleted != true)
+            throw new InvalidOperationException("File is not set to be deleted");
+
+        if(itemToDelete.Type == "folder")
+        {
+            var folderItems = await _repository.fileItemRepo.GetFilesInFolderAsync(itemToDelete.Id);
+            foreach (var folderItem in folderItems)
+            {
+                await PermanentFileInternalDeleteAsync(folderItem.Id);
+            }
+        }
+        
+        _repository.fileItemRepo.Delete(itemToDelete);
+        await _repository.SaveAsync();
+
+
+        // DYSK POTEM (z try-catch)
+        if(itemToDelete.ContentUrl != null && File.Exists(itemToDelete.ContentUrl))
+        {
+            try
+            {
+                File.Delete(itemToDelete.ContentUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"⚠️ Could not delete physical file: {ex.Message}");
+            }
+        }
+        
+        return true;
+    }   
+
+
+    public async Task CleanUpOldFilesAsync()
+    {
+        var deletedFiles = await _repository.fileItemRepo.GetDeletedFilesAsync();
+
+        var filteredFiles = deletedFiles.Where(i => i.DeletedAt < DateTime.UtcNow.AddMinutes(-3));
+
+        foreach (var item in filteredFiles)
+        {
+            try
+            {
+                await PermanentFileInternalDeleteAsync(item.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to cleanup {item.Id}: {ex.Message}");
+            }
+        }
     }
 
     public async Task<List<UserGetDto>> GetUsersWithAccess(string fileId, string userId)

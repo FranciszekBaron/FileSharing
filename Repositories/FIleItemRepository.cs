@@ -26,6 +26,11 @@ public class FileItemRepository : RepositoryBase<FileItem>, IFileItemRepository
         return GetByConditionAsync(e=>e.Starred == true);
     }
 
+    public Task<IEnumerable<FileItem>> GetDeletedFilesAsync()
+    {
+        return GetByConditionAsync(e=>e.Deleted == true);
+    }
+
     public async Task<FileItem?> GetByIdAsync(string id)
     {
        return _dbContext.FileItems.FirstOrDefault(e=>e.Id == id);

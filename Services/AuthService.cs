@@ -30,7 +30,9 @@ public class AuthService : IAuthService
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash);
         if(!isPasswordValid) 
             throw new UnauthorizedAccessException("Invalid email or password");
-    
+
+        var oldTokens = await _repository.refreshTokenRepo.GetAllByUserId(user.Id);
+        _repository.refreshTokenRepo.DeleteRange(oldTokens);
 
         var accessToken = GenerateAccessToken(user);
 
@@ -51,14 +53,21 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes"))
+            ExpiresAt = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes")),
+            User = new UserAuthDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Avatar = user.Avatar
+            },
         }; 
     }
 
 
-
     private string GenerateAccessToken(User user)
     {
+
         var secretKey = _configuration["Jwt:SecretKey"];
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -68,7 +77,9 @@ public class AuthService : IAuthService
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // Unique ID tokenu
-            new Claim("userId", user.Id) // Custom claim
+            new Claim("userId", user.Id), // Custom claim
+            new Claim("name", user.UserName),
+            new Claim("avatar", user.Avatar ?? ""),
         };
 
 
@@ -86,9 +97,23 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public Task<bool> LogoutAllAsync(string userId)
+    public async Task<bool> LogoutAllAsync(string userId)
     {
-        throw new NotImplementedException();
+        var user = await _repository.userRepo.GetByIdAsync(userId);
+
+        if (user == null)
+            throw new KeyNotFoundException ("User not found");
+        
+        var tokensToDelete = await _repository.refreshTokenRepo.GetAllByUserId(user.Id);
+
+        // ✅ Soft delete - oznacz jako unieważnione
+        foreach (var token in tokensToDelete)
+        {
+            token.IsRevoked = true;
+            token.RevokedAt = DateTime.UtcNow;
+        }
+        await _repository.SaveAsync();
+        return true;
     }
 
     public async Task<bool> LogoutAsync(string refreshToken)
@@ -118,7 +143,14 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = token.Token,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes"))
+            ExpiresAt = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes")),
+            User = new UserAuthDto
+            {
+                Id = token.User.Id,
+                UserName = token.User.UserName,
+                Email = token.User.Email,
+                Avatar = token.User.Avatar
+            }
         }; 
     }
 
@@ -146,5 +178,15 @@ public class AuthService : IAuthService
         await _repository.SaveAsync();
         
         return user;
+    }
+
+    public async Task<User> MeAsync(string userId)
+    {
+        var me = await _repository.userRepo.GetByIdAsync(userId);
+
+        if(me == null)
+            throw new KeyNotFoundException("User not found");
+
+        return me;
     }
 }

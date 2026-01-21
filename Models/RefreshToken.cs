@@ -8,6 +8,7 @@ public class RefreshToken
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsRevoked { get; set; } = false;
+    public DateTime RevokedAt { get; set; } = DateTime.UtcNow;
 
     //Nav property
     public User User { get; set; }

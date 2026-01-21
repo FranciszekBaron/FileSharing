@@ -12,18 +12,9 @@ public class RefreshTokenRepository :  RepositoryBase<RefreshToken>, IRefreshTok
             _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<RefreshTokenGetDto>> GetAllByUserId(string userId)
+    public async Task<IEnumerable<RefreshToken>> GetAllByUserId(string userId)
     {
-        var tokens = await  GetByConditionAsync(e => e.UserId == userId);
-
-        return tokens.Select(t => new RefreshTokenGetDto
-        {
-            Token = t.Token,
-            UserId = t.UserId,
-            ExpiresAt = t.ExpiresAt,
-            CreatedAt = t.CreatedAt,
-            IsRevoked = t.IsRevoked
-        });
+        return await  GetByConditionAsync(e => e.UserId == userId);
     }
 
     public async Task<RefreshToken?> GetByToken(string token)
@@ -31,5 +22,10 @@ public class RefreshTokenRepository :  RepositoryBase<RefreshToken>, IRefreshTok
         return await _dbContext.RefreshToken
         .Include(t => t.User) // ✅ Załaduj User
         .FirstOrDefaultAsync(t => t.Token == token);
+    }
+
+    public void DeleteRange(IEnumerable<RefreshToken> tokens)
+    {
+        _dbContext.RefreshToken.RemoveRange(tokens);
     }
 }

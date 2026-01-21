@@ -141,13 +141,13 @@ public class FileSharingDbContext : DbContext
                 .IsRequired();
             e.Property(t=>t.IsRevoked)
                 .IsRequired();
+            e.Property(t=>t.RevokedAt)
+                .IsRequired();
             
             e.HasOne(t=>t.User) 
             .WithMany(u=>u.RefreshTokens)
             .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-
         });
     }
 }

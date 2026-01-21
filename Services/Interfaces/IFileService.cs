@@ -23,4 +23,6 @@ public interface IFileService {
     Task<List<UserGetDto>> GetAllSharedUsers(string userId) ;
 
     Task<List<UserGetDto>> GetUsersWithAccess(string fileId,string userId);
+
+    Task CleanUpOldFilesAsync();
 }

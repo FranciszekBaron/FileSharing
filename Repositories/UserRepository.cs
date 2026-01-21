@@ -12,4 +12,9 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
     {
         return _dbContext.Users.FirstOrDefault(x => x.Email == email);    
     }
+
+    public async Task<User?> GetByIdAsync(string id)
+    {
+        return _dbContext.Users.FirstOrDefault(x=>x.Id == id);
+    }
 }
