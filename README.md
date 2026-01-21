@@ -22,10 +22,11 @@ A sample configuration file is provided:
 ## File Management API Endpoints
 All endpoints require authentication (JWT Bearer token).
 ## 📄 Files & Folders
-Method	Endpoint	Description
-GET	`/api/fileitem/{fileId}`	Retrieve all files and folders belonging to the authenticated user
-GET	/api/fileitem/{fileId}	Get details of a specific file or folder
-POST	/api/fileitem/folder	Create a new folder
-POST	/api/fileitem/uploadFile	Upload a new file
-PATCH	/api/fileitem/{fileId}/rename	Rename a file or folder
-PATCH	/api/fileitem/{fileId}/toggleStarred
+| Method | Endpoint | Description |
+|------|--------|------------|
+| GET | `/api/fileitem` | Retrieve all files and folders belonging to the authenticated user |
+| GET | `/api/fileitem/{fileId}` | Get details of a specific file or folder |
+| POST | `/api/fileitem/folder` | Create a new folder |
+| POST | `/api/fileitem/uploadFile` | Upload a new file |
+| PATCH | `/api/fileitem/{fileId}/rename` | Rename a file or folder |
+| PATCH | `/api/fileitem/{fileId}/toggleStarred` | Mark or unmark a file as starred |
