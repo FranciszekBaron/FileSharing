@@ -76,6 +76,9 @@ builder.Services.AddDbContext<FileSharingDbContext>(options =>
 
 var app = builder.Build();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"🔍 Connection String: '{connectionString}'");
+
 using (var scope = app.Services.CreateScope())
 {
     try
