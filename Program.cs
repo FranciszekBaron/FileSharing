@@ -76,7 +76,21 @@ builder.Services.AddDbContext<FileSharingDbContext>(options =>
 
 var app = builder.Build();
 
-
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<FileSharingDbContext>();
+        Console.WriteLine("Running database migrations...");
+        db.Database.Migrate();
+        Console.WriteLine("Migrations completed successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Migration failed: {ex.Message}");
+        throw;
+    }
+}
 
 // Configure pipeline
 if (app.Environment.IsDevelopment())
@@ -124,4 +138,5 @@ app.UseAuthentication();
 app.UseAuthorization();           
 
 app.MapControllers();
+
 app.Run();
