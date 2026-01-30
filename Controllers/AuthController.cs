@@ -140,8 +140,8 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Lax, // ochrona przed CRSF, ale Lax bo local
+            Secure = true,
+            SameSite = SameSiteMode.None, // ochrona przed CRSF, Lax na local, None na cross-origin
             Expires = expiresAt,
             Path = "/"
         };
@@ -155,8 +155,8 @@ public class AuthController : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,  
-            SameSite = SameSiteMode.Lax,  // Lax nie Strict na lokal 
+            Secure = true,  
+            SameSite = SameSiteMode.None,  // Lax nie Strict na lokal 
             Expires = DateTime.UtcNow.AddDays(
                 _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays")
             ),
