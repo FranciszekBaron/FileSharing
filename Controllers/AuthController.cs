@@ -36,6 +36,12 @@ public class AuthController : ControllerBase
     {
         var refreshToken = Request.Cookies["refreshToken"];
 
+        Console.WriteLine("🍪 Cookies received:");
+        foreach (var cookie in Request.Cookies)
+        {
+            Console.WriteLine($"  {cookie.Key} = {cookie.Value}");
+        }
+
         if (string.IsNullOrEmpty(refreshToken))
         {
             return Unauthorized(new { error = "Refresh token not found" });
